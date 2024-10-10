@@ -7,6 +7,8 @@
 	tool = vimdiff
 [merge]
 	tool = vimdiff
+[mergetool]
+	keepBackup = false
 [color]
     ui = auto
     branch = auto
@@ -31,6 +33,5 @@
     st = stash
     stp = stash pop
     stl = stash list
-
 [fetch]
     prune = true  # Automatically remove remote-tracking branches that no longer exist on the remote
