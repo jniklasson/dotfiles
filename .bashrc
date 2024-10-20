@@ -91,4 +91,6 @@ extract() {
     fi
 }
 
-echo "Welcome back, $(whoami)! Today is $(date +'%A, %B %d, %Y')."
+if [[ $- == *i* ]]; then
+    echo "Welcome back, $(whoami)! Today is $(date +'%A, %B %d, %Y')."
+fi
