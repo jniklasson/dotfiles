@@ -157,6 +157,8 @@ nnoremap <C-d> <C-d>zz
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 nnoremap - @@
+nnoremap <leader>c :call CommentLines()<CR>
+vnoremap <leader>c :call CommentLines()<CR>
 
 " NVIM
 nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>
@@ -248,6 +250,39 @@ function! SetAleTextColors() abort
 endfunction
 
 autocmd ColorScheme * call SetAleTextColors()
+
+" Function to comment the current line or selected lines
+function! CommentLines()
+    " Get the current file type
+    let l:ft = &filetype
+
+    " Determine the comment string based on the file type
+    if l:ft == 'c' || l:ft == 'cpp'
+        let l:comment_str = '// '
+    elseif l:ft == 'rust'
+        let l:comment_str = '// '
+    elseif l:ft == 'bash'
+        let l:comment_str = '# '
+    elseif l:ft == 'vim'
+        let l:comment_str = '" '
+    else
+        return
+    endif
+
+    " In normal mode, comment the current line and move down
+    if mode() == 'n'
+        execute 'normal! I' . l:comment_str
+        execute 'normal! j'
+    " In visual mode, comment the selected lines
+    elseif mode() == 'v'
+        let l:start = getpos("'<")[1]
+        let l:end = getpos("'>")[1]
+        execute l:start . ',' . l:end . 's/^/' . l:comment_str . '/'
+        normal! gv
+    endif
+endfunction
+
+
 
 " }}}
 
