@@ -251,38 +251,54 @@ endfunction
 
 autocmd ColorScheme * call SetAleTextColors()
 
-" Function to comment the current line or selected lines
 function! CommentLines()
-    " Get the current file type
-    let l:ft = &filetype
+    " Add comment strings for supported languages here.
+    let l:comment_dict = {
+        \ 'c': '//',
+        \ 'cpp': '//',
+        \ 'rust': '//',
+        \ 'bash': '# ',
+        \ 'vim': '" '
+    \ }
 
-    " Determine the comment string based on the file type
-    if l:ft == 'c' || l:ft == 'cpp'
-        let l:comment_str = '// '
-    elseif l:ft == 'rust'
-        let l:comment_str = '// '
-    elseif l:ft == 'bash'
-        let l:comment_str = '# '
-    elseif l:ft == 'vim'
-        let l:comment_str = '" '
-    else
+    " Escape forward slashes in the comment strings
+    for l:lang in keys(l:comment_dict)
+        let l:comment_dict[l:lang] = substitute(l:comment_dict[l:lang], '/', '\\/', 'g')
+    endfor
+
+    let l:ft = &filetype
+    let l:comment_str = get(l:comment_dict, l:ft, '')
+    if l:comment_str == ''
         return
     endif
 
-    " In normal mode, comment the current line and move down
+    " Normal mode - Handle single line.
     if mode() == 'n'
-        execute 'normal! I' . l:comment_str
+        call ToggleComment(l:comment_str, '.')
         execute 'normal! j'
-    " In visual mode, comment the selected lines
+    " Visual mode - Handle selected lines (one or more)
     elseif mode() == 'v'
         let l:start = getpos("'<")[1]
         let l:end = getpos("'>")[1]
-        execute l:start . ',' . l:end . 's/^/' . l:comment_str . '/'
+        call ToggleComment(l:comment_str, l:start . ',' . l:end)
         normal! gv
     endif
 endfunction
 
+function! ToggleComment(comment_str, range)
+    " Check if the first line in the range is commented
+    let l:first_line = getline(a:range == '.' ? '.' : split(a:range, ',')[0])
 
+    if l:first_line =~ '^' . a:comment_str
+        " Uncomment the lines
+        let l:command = a:range . 's/^' . a:comment_str . '//'
+        execute l:command
+    else
+        " Comment the lines
+        let l:command = a:range . 's/^/' . a:comment_str
+        execute l:command
+    endif
+endfunction
 
 " }}}
 
