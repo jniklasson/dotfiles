@@ -162,12 +162,14 @@ vnoremap <leader>c :call CommentLines()<CR>
 
 " NVIM
 nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>
-xnoremap * y/\V<C-R>"<CR>
 nnoremap & :&&<CR>
-xnoremap # y?\V<C-R>"<CR>
 
 " Buffers
-nnoremap gb :ls<CR>:buffer  
+if exists('g:loaded_fzf')
+    nnoremap gb :Buffers<CR>
+else
+    nnoremap gb :ls<CR>:buffer 
+endif
 nnoremap gl :b#<CR>
 nnoremap <C-n> :bnext<CR>
 nnoremap <C-b> :bprevious<CR>
@@ -258,6 +260,7 @@ function! CommentLines()
         \ 'cpp': '//',
         \ 'rust': '//',
         \ 'bash': '# ',
+        \ 'python': '# ',
         \ 'vim': '" '
     \ }
 
