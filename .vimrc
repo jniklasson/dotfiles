@@ -165,11 +165,7 @@ nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>
 nnoremap & :&&<CR>
 
 " Buffers
-if exists('g:loaded_fzf')
-    nnoremap gb :Buffers<CR>
-else
-    nnoremap gb :ls<CR>:buffer 
-endif
+nnoremap gb :Buffers<CR>
 nnoremap gl :b#<CR>
 nnoremap <C-n> :bnext<CR>
 nnoremap <C-b> :bprevious<CR>
@@ -251,7 +247,7 @@ function! SetAleTextColors() abort
     highlight link ALEVirtualTextInfo Comment
 endfunction
 
-autocmd ColorScheme * call SetAleTextColors()
+autocmd VimEnter * call SetAleTextColors()
 
 function! CommentLines()
     " Add comment strings for supported languages here.
