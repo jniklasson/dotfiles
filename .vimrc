@@ -25,7 +25,7 @@ let g:ale_linters = {
             \   'python':['flake8','jedils'],
             \   'cpp': ['clangd'],
             \   'c': ['clangd'],
-            \   'rust':['analyzer','cargo'],
+            \   'rust':['analyzer'],
             \}
 
 let g:ale_fixers = {
@@ -37,8 +37,11 @@ let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_insert_leave = 0
 let g:ale_lint_on_enter = 1
 let g:ale_fix_on_save = 0
+let g:ale_floating_preview = 1
+let g:ale_hover_to_floating_preview = 1
+let g:ale_lsp_suggestions = 1
 let g:ale_completion_enabled = 1
-let g:ale_completion_autoimport = 1
+let g:ale_completion_autoimport = 0
 let g:ale_rust_cargo_use_clippy = 1
 
 let g:ale_python_isort_options = '--profile black'
@@ -198,6 +201,7 @@ nnoremap gn :ALENext<CR>
 nnoremap gp :ALEPrevious<CR>
 nnoremap gr :ALEFindReferences<CR>
 inoremap <C-@> <C-\><C-O>:ALEComplete<CR>
+nnoremap <leader>ad :ALEDetail<CR>
 
 nnoremap gd :<C-u>call ALEJump("ALEGoToDefinition")<CR>
 nnoremap gr :<C-u>call ALEJump("ALEFindReferences")<CR>
