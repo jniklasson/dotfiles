@@ -64,24 +64,6 @@ alias ..='cd ..'
 alias ...='cd ../..'  
 alias ~='cd ~'  
 
-# Start tmux automatically if not already in a tmux session and not an SSH session
-# Start tmux automatically if not already in a tmux session and not an SSH session
-if command -v tmux &> /dev/null; then
-    if [ -z "$TMUX" ] && [ -z "$SSH_CONNECTION" ]; then
-        # Set the desired session name
-        SESSION_NAME="Main"
-
-        # Check if the session exists
-        if tmux has-session -t $SESSION_NAME 2>/dev/null; then
-            # Attach to the existing session
-            tmux attach-session -t $SESSION_NAME
-        else
-            # Create a new session
-            tmux new-session -s $SESSION_NAME
-        fi
-    fi
-fi
-
 # Source fzf keybinds
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
