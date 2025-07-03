@@ -11,7 +11,7 @@ call plug#begin()
     Plug 'vim-airline/vim-airline'
     Plug 'tpope/vim-fugitive'
     Plug 'preservim/nerdtree'
-    Plug 'junegunn/fzf'
+    Plug '~/.fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'morhetz/gruvbox'
     Plug 'rust-lang/rust.vim'
