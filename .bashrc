@@ -29,6 +29,11 @@ if [ -f "$HOME/.bash_functions" ]; then
     . "$HOME/.bash_functions"
 fi
 
+# Source environment variables
+if [ -f ~/.env ]; then
+    source ~/.env
+fi
+
 # User specific environment
 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
 then
@@ -59,14 +64,20 @@ shopt -s nocaseglob
 
 # Alias
 alias ls='ls --color=auto'
-alias ll='ls -laAh --color=auto'
+alias ll='ls -laAhF --color=auto'
 alias ..='cd ..'  
 alias ...='cd ../..'  
 alias ~='cd ~'  
 
 # Source fzf keybinds
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+if [ -f ~/.fzf.bash ]; then
+    source ~/.fzf.bash
+fi
 
+# Alacritty completion
+if [ -f ~/.bash_completion/alacritty ]; then
+    source ~/.bash_completion/alacritty
+fi
 extract() {
     if [ -f "$1" ]; then
         case "$1" in
