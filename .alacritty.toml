@@ -1,0 +1,29 @@
+
+[window]
+
+opacity = 0.8
+blur = true
+title = "Terminal"
+
+decorations = "Full"
+
+[font]
+
+normal.family = "Cascadia Code PL"
+bold.family = "Cascadia Code PL"
+italic.family = "Cascadia Code PL"
+bold_italic.family = "Cascadia Code PL"
+
+size = 15.0
+
+[cursor]
+style.shape = "Block"
+
+style.blinking = "On"
+
+[[hints.enabled]]
+command = "xdg-open"
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
