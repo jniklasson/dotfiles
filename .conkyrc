@@ -12,20 +12,21 @@ conky.config = {
     --==========================================================================
     own_window = true,
     own_window_type = 'desktop',
-    own_window_transparent = false, 
+    own_window_transparent = true,
     own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
-    own_window_colour = '#2E3440', 
+    own_window_colour = '#2E3440',
     own_window_argb_visual = true,
-    own_window_argb_value = 0, 
+    own_window_argb_value = 230, -- 255 is solid
 
     --==========================================================================
     --  PLACEMENT
     --==========================================================================
+    -- Use 'xinerama_head' to choose monitor (1=primary, 2=secondary, etc.)
     xinerama_head = 2,
     alignment = 'top_right',
     gap_x = 40,
     gap_y = 40,
-    minimum_width = 300,
+    minimum_width = 320,
     minimum_height = 500,
 
     --==========================================================================
@@ -37,19 +38,18 @@ conky.config = {
     draw_graph_borders = true,
     double_buffer = true,
     use_xft = true,
-    font = 'Cantarell:style=Regular:size=9',
-    override_utf8_locale = true, 
+    font = 'Cantarell:size=10',
     xftalpha = 1,
 
     --==========================================================================
     --  COLORS (Nord Theme Palette)
     --==========================================================================
-    default_color = '#D8DEE9',
-    color1 = '#ECEFF4',
-    color2 = '#88C0D0',
-    color3 = '#81A1C1',
-    color4 = '#5E81AC',
-    color5 = '#BF616A',
+    default_color = '#D8DEE9',      -- nord4 - Standard text
+    color1 = '#ECEFF4',             -- nord6 - Headers (white)
+    color2 = '#88C0D0',             -- nord8 - Frostblue (accent 1)
+    color3 = '#81A1C1',             -- nord9 - Frost blue (accent 2)
+    color4 = '#5E81AC',             -- nord10 - Darker blue (graphs)
+    color5 = '#BF616A',             -- nord11 - Red (Warnings)
 
     --==========================================================================
     --  BEHAVIOR
@@ -57,30 +57,30 @@ conky.config = {
     update_interval = 2.0,
     cpu_avg_samples = 2,
     net_avg_samples = 2,
-    no_buffers = true,
     imlib_cache_size = 0,
     uppercase = false,
-    text_buffer_size = 4096,
+    text_buffer_size = 2048,
 };
 
 conky.text = [[
 #==============================================================================
 #  TIME & DATE
 #==============================================================================
-${alignc}${color1}${font Cantarell:bold:size=36}${time %H:%M}${font}
-${alignc}${color3}${font Cantarell:size=12}${time %A, %d %B}${font}
+${alignc}${color1}${font Cantarell:bold:size=38}${time %H:%M}${font}
+${alignc}${color3}${font Cantarell:size=14}${time %A, %d %B}${font}
 ${alignc}${color2}Uptime: ${uptime}
 
-${voffset 10}${color4}${hr 2}
+${voffset 15}${color4}${hr 2}
 
 #==============================================================================
 #  SYSTEM & CPU
 #==============================================================================
-${voffset 8}${color1}${font Cantarell:bold:size=11}SYSTEM ${hr 2}${font}
+${voffset 10}${color1}${font Cantarell:bold:size=12}SYSTEM ${hr 2}${font}
+${voffset 5}${color2}Host:${alignr}${nodename}
 ${color2}Kernel:${alignr}${kernel}
 
-${voffset 8}${color1}${font Cantarell:bold:size=11}CPU${alignr}${cpu cpu0}%${font}
-${color4}${cpubar cpu0 6,0} -- Thinner bar for compactness
+${voffset 10}${color1}${font Cantarell:bold:size=12}CPU${alignr}${cpu cpu0}%${font}
+${color4}${cpubar cpu0 8,0}
 ${color3}Top CPU Processes:${alignr}CPU%
 ${color2} ${top name 1}${alignr}${top cpu 1}%
 ${color2} ${top name 2}${alignr}${top cpu 2}%
@@ -89,29 +89,23 @@ ${color2} ${top name 3}${alignr}${top cpu 3}%
 #==============================================================================
 #  MEMORY & DISK
 #==============================================================================
-${voffset 8}${color1}${font Cantarell:bold:size=11}RAM${alignr}${mem} / ${memmax}${font}
-${color4}${membar 6,0}
-${color3}Top RAM Processes:${alignr}MEM
-${color2} ${top_mem name 1}${alignr}${top_mem mem 1} MB 
-${color2} ${top_mem name 2}${alignr}${top_mem mem 2} MB
-${color2} ${top_mem name 3}${alignr}${top_mem mem 3} MB
+${voffset 10}${color1}${font Cantarell:bold:size=12}RAM${alignr}${mem} / ${memmax}${font}
+${color4}${membar 8,0}
+${color3}Top RAM Processes:${alignr}MEM%
+${color2} ${top_mem name 1}${alignr}${top_mem mem_res 1}
+${color2} ${top_mem name 2}${alignr}${top_mem mem_res 2}
+${color2} ${top_mem name 3}${alignr}${top_mem mem_res 3}
 
-${voffset 8}${color1}${font Cantarell:bold:size=11}DISK USAGE${font}
+${voffset 10}${color1}${font Cantarell:bold:size=12}DISK USAGE${font}
 ${color3}Home:${alignr}${fs_used /home} / ${fs_size /home}
-${color4}${fs_bar 6 /home}
+${color4}${fs_bar 8 /home}
+
 #==============================================================================
 #  NETWORK
 #==============================================================================
-${voffset 8}${color1}${font Cantarell:bold:size=11}NETWORK${font}
-${if_existing /sys/class/net/enp7s0}${color3}Download: ${downspeedf enp7s0} KB/s${alignr}Upload: ${upspeedf enp7s0} KB/s
-${color4}${downspeedgraph enp7s0 25,150 ${color4} ${color5}} ${alignr}${upspeedgraph enp7s0 25,150 ${color4} ${color5}}
-${color2}Total Down: ${totaldown enp7s0}${alignr}Total Up: ${totalup enp7s0}${endif}
-
-#==============================================================================
-#  OPTIONAL: BATTERY (Uncomment if on a laptop)
-#==============================================================================
-#${voffset 8}${color1}${font Cantarell:bold:size=11}BATTERY${font}
-#${color3}Status:${alignr}${battery_percent BAT0}% (${battery_time BAT0})
-#${color4}${battery_bar 6,0 BAT0}
+${voffset 10}${color1}${font Cantarell:bold:size=12}NETWORK${font}
+${color3}Download: ${downspeedf enp7s0} KB/s${alignr}Upload: ${upspeedf enp7s0} KB/s
+${color4}${downspeedgraph enp7s0 25,150} ${alignr}${upspeedgraph enp7s0 25,150}
+${color2}Total Down: ${totaldown enp7s0}${alignr}Total Up: ${totalup enp7s0}
 
 ]];
