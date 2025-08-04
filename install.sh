@@ -6,10 +6,11 @@ DOTFILES_DIR="$(pwd)"
 # List of dotfiles to symlink
 declare -a dotfiles=(
     ".alacritty.toml"
-    ".tmux.conf"
     ".bashrc"
-    ".vimrc"
+    ".conkyrc"
     ".gitconfig"
+    ".tmux.conf"
+    ".vimrc"
 )
 
 # Create symbolic links
