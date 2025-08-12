@@ -113,6 +113,8 @@ set noswapfile
 set scrolloff=25
 set nowrap
 set incsearch
+set ignorecase
+set colorcolumn=100
 set smartcase
 set showmatch
 set showcmd
