@@ -137,6 +137,7 @@ set term=xterm-256color
 set exrc
 set secure
 set background=dark
+set textwidth=100
 
 try
     colorscheme gruvbox
@@ -149,8 +150,6 @@ endtry
 " REMAPS ---------------------------------------------------------------------- {{{
 let mapleader = ","
 
-nnoremap o o<esc>
-nnoremap O O<esc>
 nnoremap Y y$
 noremap ¤ $
 noremap ö [
