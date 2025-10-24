@@ -1,5 +1,3 @@
-# .bashrc
-
 # Source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
@@ -44,6 +42,12 @@ export PATH
 export EDITOR='vi'
 
 export GREP_OPTIONS='--color=auto'
+
+set -o vi
+
+bind 'set show-mode-in-prompt on'
+bind 'set vi-ins-mode-string "\1\e[38;5;245m\2[\1\e[92m\2I\1\e[38;5;245m\2]\1\e[0m\2 "'
+bind 'set vi-cmd-mode-string "\1\e[38;5;245m\2[\1\e[95m\2N\1\e[38;5;245m\2]\1\e[0m\2 "'
 
 # Prompt
 PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)' 
