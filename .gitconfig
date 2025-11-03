@@ -7,8 +7,10 @@
 	tool = vimdiff
 [merge]
 	tool = vimdiff
+    conflictstyle = diff3
 [mergetool]
 	keepBackup = false
+    prompt = false
 [color]
     ui = auto
     branch = auto
@@ -31,6 +33,7 @@
     ps = push
     rb = rebase
     rbi = rebase -i
+    rbc = rebase --continue
     st = stash
     stp = stash pop
     stl = stash list
