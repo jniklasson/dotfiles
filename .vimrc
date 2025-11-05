@@ -261,11 +261,9 @@ function! CommentLines()
     return
   endif
 
-  " Normal mode - Handle single line.
   if mode() == 'n'
     call ToggleComment(l:comment_str, '.')
     execute 'normal! j'
-  " Visual mode - Handle selected lines (one or more)
   elseif mode() == 'v'
     let l:start = getpos("'<")[1]
     let l:end = getpos("'>")[1]
@@ -275,18 +273,15 @@ function! CommentLines()
 endfunction
 
 function! ToggleComment(comment_str, range)
-  " Check if the first line in the range is commented
-  let l:first_line = getline(a:range == '.' ? '.' : split(a:range, ',')[0])
+    let l:first_line = getline(a:range == '.' ? '.' : split(a:range, ',')[0])
 
-  if l:first_line =~ '^' . a:comment_str
-    " Uncomment the lines
-    let l:command = a:range . 's/^' . a:comment_str . '//'
-    execute l:command
-  else
-    " Comment the lines
-    let l:command = a:range . 's/^/' . a:comment_str
-    execute l:command
-  endif
+    if l:first_line =~ '^\s*' . a:comment_str
+        let l:command = a:range . 's/^\s*\zs' . a:comment_str . '//'
+        execute l:command
+    else
+        let l:command = a:range . 'g/\S/s/^\s*/&' . a:comment_str . '/'
+        execute l:command
+    endif
 endfunction
 
 " }}}
