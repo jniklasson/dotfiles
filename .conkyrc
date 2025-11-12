@@ -1,27 +1,26 @@
 --[[
 ==============================================================================
 |                                                                            |
-|                    CONKY CONFIGURATION - NORDIC DARK THEME                 |
+|                   CONKY CONFIGURATION - SUNSET THEME                       |
 |                                                                            |
 ==============================================================================
 ]]
 
 conky.config = {
     --==========================================================================
-    --  WINDOW SETTINGS
+    --  WINDOW SETTINGS 
     --==========================================================================
     own_window = true,
     own_window_type = 'desktop',
-    own_window_transparent = true,
     own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
-    own_window_colour = '#2E3440',
+    -- Set window to be fully transparent, we will draw the background manually
+    own_window_colour = '#000000',
     own_window_argb_visual = true,
-    own_window_argb_value = 230, -- 255 is solid
+    own_window_argb_value = 0,
 
     --==========================================================================
     --  PLACEMENT
     --==========================================================================
-    -- Use 'xinerama_head' to choose monitor (1=primary, 2=secondary, etc.)
     xinerama_head = 2,
     alignment = 'top_right',
     gap_x = 40,
@@ -39,17 +38,16 @@ conky.config = {
     double_buffer = true,
     use_xft = true,
     font = 'Cantarell:size=10',
-    xftalpha = 1,
 
     --==========================================================================
-    --  COLORS (Nord Theme Palette)
+    --  COLORS 
     --==========================================================================
-    default_color = '#D8DEE9',      -- nord4 - Standard text
-    color1 = '#ECEFF4',             -- nord6 - Headers (white)
-    color2 = '#88C0D0',             -- nord8 - Frostblue (accent 1)
-    color3 = '#81A1C1',             -- nord9 - Frost blue (accent 2)
-    color4 = '#5E81AC',             -- nord10 - Darker blue (graphs)
-    color5 = '#BF616A',             -- nord11 - Red (Warnings)
+    default_color = '#EAE3B6',      -- Soft Yellow (Sun)
+    color1 = '#F0935D',             -- Bright Orange (Sunset Glow)
+    color2 = '#C2606A',             -- Muted Red (Mountains)
+    color3 = '#8D6A98',             -- Dusky Purple (Sky)
+    color4 = '#42385D',             -- Deep Indigo (Shadows)
+    color5 = '#BF616A',             -- A standard Red for warnings
 
     --==========================================================================
     --  BEHAVIOR
@@ -75,7 +73,7 @@ ${voffset 15}${color4}${hr 2}
 #==============================================================================
 #  SYSTEM & CPU
 #==============================================================================
-${voffset 10}${color1}${font Cantarell:bold:size=12}SYSTEM ${hr 2}${font}
+${voffset 10}${color1}${font Cantarell:bold:size=12}SYSTEM ${font}
 ${voffset 5}${color2}Host:${alignr}${nodename}
 ${color2}Kernel:${alignr}${kernel}
 
@@ -86,19 +84,35 @@ ${color2} ${top name 1}${alignr}${top cpu 1}%
 ${color2} ${top name 2}${alignr}${top cpu 2}%
 ${color2} ${top name 3}${alignr}${top cpu 3}%
 
+${voffset 15}${color4}${hr 2}
+
+#==============================================================================
+#  GPU - NVIDIA 
+#==============================================================================
+${voffset 10}${color1}${font Cantarell:bold:size=12}GPU - ${execi 60 nvidia-smi --query-gpu=gpu_name --format=csv,noheader,nounits}${font}
+${color2}Temperature:${alignr}${execi 5 nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits}°C
+${color2}GPU Usage:${alignr}${execi 5 nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits}%
+${color2}VRAM Usage:${alignr}${execi 5 nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits} / ${execi 5 nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits}
+
+${voffset 15}${color4}${hr 2}
+
 #==============================================================================
 #  MEMORY & DISK
 #==============================================================================
 ${voffset 10}${color1}${font Cantarell:bold:size=12}RAM${alignr}${mem} / ${memmax}${font}
 ${color4}${membar 8,0}
 ${color3}Top RAM Processes:${alignr}MEM%
-${color2} ${top_mem name 1}${alignr}${top_mem mem_res 1}
-${color2} ${top_mem name 2}${alignr}${top_mem mem_res 2}
-${color2} ${top_mem name 3}${alignr}${top_mem mem_res 3}
+${color2} ${top name 1}${alignr}${top mem 1}%
+${color2} ${top name 2}${alignr}${top mem 2}%
+${color2} ${top name 3}${alignr}${top mem 3}%
 
 ${voffset 10}${color1}${font Cantarell:bold:size=12}DISK USAGE${font}
 ${color3}Home:${alignr}${fs_used /home} / ${fs_size /home}
 ${color4}${fs_bar 8 /home}
+${color3}Games & Shit:${alignr}${fs_used /home/jniklasson/games} / ${fs_size /home/jniklasson/games}
+${color4}${fs_bar 8 /home/jniklasson/games}
+
+${voffset 15}${color4}${hr 2}
 
 #==============================================================================
 #  NETWORK
@@ -106,6 +120,6 @@ ${color4}${fs_bar 8 /home}
 ${voffset 10}${color1}${font Cantarell:bold:size=12}NETWORK${font}
 ${color3}Download: ${downspeedf enp7s0} KB/s${alignr}Upload: ${upspeedf enp7s0} KB/s
 ${color4}${downspeedgraph enp7s0 25,150} ${alignr}${upspeedgraph enp7s0 25,150}
-${color2}Total Down: ${totaldown enp7s0}${alignr}Total Up: ${totalup enp7s0}
+${color2}Total Down: ${totaldown enp7s0}${alignr}Total Up: ${totalup enp7s0} 
 
 ]];
