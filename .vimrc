@@ -7,14 +7,15 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin()
-  Plug 'dense-analysis/ale'
-  Plug 'vim-airline/vim-airline'
-  Plug 'tpope/vim-fugitive'
-  Plug 'preservim/nerdtree'
-  Plug '~/.fzf'
-  Plug 'junegunn/fzf.vim'
-  Plug 'morhetz/gruvbox'
-  Plug 'rust-lang/rust.vim'
+    Plug 'dense-analysis/ale'
+    Plug 'vim-airline/vim-airline'
+    Plug 'tpope/vim-fugitive'
+    Plug 'preservim/nerdtree'
+    Plug '~/.fzf'
+    Plug 'junegunn/fzf.vim'
+    Plug 'morhetz/gruvbox'
+    Plug 'rust-lang/rust.vim'
+    Plug 'lervag/vimtex'
 call plug#end()
 
 " }}}
@@ -75,6 +76,17 @@ let g:airline_symbols.dirty='⚡'
 " Gruvbox
 let g:gruvbox_contrast_dark = 'hard'  " Options: 'soft', 'medium', 'hard'
 let g:gruvbox_invert_selection = 0    " Keep selection background color
+
+let g:tex_flavor = 'latex'
+
+let g:vimtex_compiler_method = 'latexmk'
+let g:vimtex_compiler_latexmk = {
+    \ 'options' : [
+    \   '-pdf',
+    \   '-interaction=nonstopmode',
+    \   '-synctex=1',
+    \ ],
+    \}
 
 " }}}
 
