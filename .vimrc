@@ -201,9 +201,9 @@ nnoremap gp :ALEPrevious<CR>
 inoremap <C-@> <C-\><C-O>:ALEComplete<CR>
 nnoremap <leader>ad :ALEDetail<CR>
 
-nnoremap gd :<C-u>call ALEJump("ALEGoToDefinition")<CR>
-nnoremap gr :<C-u>call ALEJump("ALEFindReferences")<CR>
-nnoremap gt :<C-u>call ALEJump("ALEGoToTypeDefinition")<CR>
+nnoremap gd :ALEGoToDefinition<CR>
+nnoremap gr :ALEFindReferences<CR>
+nnoremap gt :ALEGoToTypeDefinition<CR>
 
 " NERD TREE
 nnoremap <F2> :NERDTreeToggle<CR>
@@ -215,16 +215,7 @@ nnoremap <F4> :<C-u>call ToggleQuickFix()<CR>
 
 " SCRIPTS ---------------------------------------------------------------------- {{{
 "
-" If no splits are open, open in a split, else use current window.
-function! ALEJump(command)
-  set splitright
-  if winnr('$') == 1
-    execute a:command . ' -vsplit'
-  else
-    execute a:command
-  endif
-endfunction
-
+"
 function! RipgrepVisualSelection()
   let old_reg = @"
   normal! gvy
