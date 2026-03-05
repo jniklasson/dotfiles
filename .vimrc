@@ -10,7 +10,7 @@ call plug#begin()
     Plug 'dense-analysis/ale'
     Plug 'vim-airline/vim-airline'
     Plug 'tpope/vim-fugitive'
-    Plug 'preservim/nerdtree'
+    Plug 'tpope/vim-commentary'
     Plug '~/.fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'morhetz/gruvbox'
@@ -77,8 +77,6 @@ let g:airline_symbols.dirty='⚡'
 let g:gruvbox_contrast_dark = 'hard'  " Options: 'soft', 'medium', 'hard'
 let g:gruvbox_invert_selection = 0    " Keep selection background color
 
-let g:tex_flavor = 'latex'
-
 let g:vimtex_compiler_method = 'latexmk'
 let g:vimtex_compiler_latexmk = {
     \ 'options' : [
@@ -88,6 +86,14 @@ let g:vimtex_compiler_latexmk = {
     \ ],
     \}
 
+" Netrw settings
+let g:netrw_banner = 0        " Hide the top banner
+let g:netrw_liststyle = 3     " Tree view (similar to NERDTree)
+let g:netrw_browse_split = 4  " Open files in the previous window
+let g:netrw_altv = 1          " Open splits to the right
+let g:netrw_winsize = 25      " Set width to 25%
+
+
 " }}}
 
 " GENERAL ---------------------------------------------------------------------- {{{
@@ -96,7 +102,6 @@ augroup filetype_vim
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
 
-set nocompatible
 set encoding=utf-8
 filetype plugin indent on
 syntax on
@@ -127,7 +132,6 @@ set hidden
 set updatetime=500
 set signcolumn=yes
 set nohlsearch
-set ttyfast
 set autoread
 set backspace=indent,eol,start
 set belloff=all
@@ -159,8 +163,6 @@ nnoremap <C-d> <C-d>zz
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 nnoremap - @@
-nnoremap <leader>c :call CommentLines()<CR>
-vnoremap <leader>c :call CommentLines()<CR>
 
 " NVIM
 nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>
@@ -206,9 +208,8 @@ nnoremap gr :ALEFindReferences<CR>
 nnoremap gt :ALEGoToTypeDefinition<CR>
 
 " NERD TREE
-nnoremap <F2> :NERDTreeToggle<CR>
-nnoremap <F3> :NERDTreeFind<CR>
-
+nnoremap <F2> :Lexplore<CR>
+nnoremap <F3> :Lexplore %:p:h<CR>
 " Quickfix window toggle
 nnoremap <F4> :<C-u>call ToggleQuickFix()<CR>
 " }}}
@@ -241,51 +242,6 @@ function! SetAleTextColors() abort
 endfunction
 
 autocmd VimEnter * call SetAleTextColors()
-
-function! CommentLines()
-  " Add comment strings for supported languages here.
-  let l:comment_dict = {
-      \ 'c': '//',
-      \ 'cpp': '//',
-      \ 'rust': '//',
-      \ 'bash': '# ',
-      \ 'python': '# ',
-      \ 'vim': '" '
-  \ }
-
-  " Escape forward slashes in the comment strings
-  for l:lang in keys(l:comment_dict)
-    let l:comment_dict[l:lang] = substitute(l:comment_dict[l:lang], '/', '\\/', 'g')
-  endfor
-
-  let l:ft = &filetype
-  let l:comment_str = get(l:comment_dict, l:ft, '')
-  if l:comment_str == ''
-    return
-  endif
-
-  if mode() == 'n'
-    call ToggleComment(l:comment_str, '.')
-    execute 'normal! j'
-  elseif mode() == 'v'
-    let l:start = getpos("'<")[1]
-    let l:end = getpos("'>")[1]
-    call ToggleComment(l:comment_str, l:start . ',' . l:end)
-    normal! gv
-  endif
-endfunction
-
-function! ToggleComment(comment_str, range)
-    let l:first_line = getline(a:range == '.' ? '.' : split(a:range, ',')[0])
-
-    if l:first_line =~ '^\s*' . a:comment_str
-        let l:command = a:range . 's/^\s*\zs' . a:comment_str . '//'
-        execute l:command
-    else
-        let l:command = a:range . 'g/\S/s/^\s*/&' . a:comment_str . '/'
-        execute l:command
-    endif
-endfunction
 
 " }}}
 
