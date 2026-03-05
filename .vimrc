@@ -87,12 +87,10 @@ let g:vimtex_compiler_latexmk = {
     \}
 
 " Netrw settings
-let g:netrw_banner = 0        " Hide the top banner
-let g:netrw_liststyle = 3     " Tree view (similar to NERDTree)
-let g:netrw_browse_split = 4  " Open files in the previous window
-let g:netrw_altv = 1          " Open splits to the right
-let g:netrw_winsize = 25      " Set width to 25%
-
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_altv = 1
+let g:netrw_fastbrowse = 0
 
 " }}}
 
@@ -209,7 +207,7 @@ nnoremap gt :ALEGoToTypeDefinition<CR>
 
 " NERD TREE
 nnoremap <F2> :Lexplore<CR>
-nnoremap <F3> :Lexplore %:p:h<CR>
+nnoremap <F3> :Rex<CR>
 " Quickfix window toggle
 nnoremap <F4> :<C-u>call ToggleQuickFix()<CR>
 " }}}
