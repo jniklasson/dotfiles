@@ -1,87 +1,113 @@
 # Source global definitions
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
-fi
+[ -f /etc/bashrc ] && . /etc/bashrc
+[ -f /etc/bash.bashrc ] && . /etc/bash.bashrc
 
-# Enable programmable completion features
-if [ -f /etc/bash_completion ]; then
+# Stop here for non-interactive shells
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
+
+# Bash completion
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
 
-# User specific aliases and functions
-if [ -d ~/.bashrc.d ]; then
-	for rc in ~/.bashrc.d/*; do
-		if [ -f "$rc" ]; then
-			. "$rc"
-		fi
-	done
-fi
-unset rc
+# Path
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
 
-# Source custom scripts
-if [ -f "$HOME/.bash_aliases" ]; then
-    . "$HOME/.bash_aliases"
-fi
+case ":$PATH:" in
+    *":$HOME/bin:"*) ;;
+    *) PATH="$HOME/bin:$PATH" ;;
+esac
 
-if [ -f "$HOME/.bash_functions" ]; then
-    . "$HOME/.bash_functions"
-fi
-
-# Source environment variables
-if [ -f ~/.env ]; then
-    source ~/.env
-fi
-
-# User specific environment
-if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
-then
-    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
-fi
 export PATH
 
+# Source user files
+[ -f "$HOME/.bash_aliases" ] && . "$HOME/.bash_aliases"
+[ -f "$HOME/.bash_functions" ] && . "$HOME/.bash_functions"
+[ -f "$HOME/.env" ] && . "$HOME/.env"
+
+if [ -d "$HOME/.bashrc.d" ]; then
+    for rc in "$HOME"/.bashrc.d/*; do
+        [ -f "$rc" ] && . "$rc"
+    done
+    unset rc
+fi
+
+# Environment
 export EDITOR='vi'
 
-export GREP_OPTIONS='--color=auto'
-
+# Readline / vi mode
 set -o vi
-
 bind 'set show-mode-in-prompt on'
+bind 'set completion-ignore-case on'
 bind 'set vi-ins-mode-string "\1\e[38;5;245m\2[\1\e[92m\2I\1\e[38;5;245m\2]\1\e[0m\2 "'
 bind 'set vi-cmd-mode-string "\1\e[38;5;245m\2[\1\e[95m\2N\1\e[38;5;245m\2]\1\e[0m\2 "'
 
 # Prompt
-PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)' 
-PS1='\[\e[92m\]\u\[\e[0m\]@\h:[\[\e[38;5;51m\]\W\[\e[0m\]] \[\e[95m\]${PS1_CMD1}\[\e[0m\] \\$ '
+PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)'
+PS1='\[\e[92m\]\u\[\e[0m\]@\h:[\[\e[38;5;51m\]\W\[\e[0m\]] \[\e[95m\]${PS1_CMD1}\[\e[0m\] \$ '
 
-# History settings
+# History
 HISTSIZE=10000
 HISTFILESIZE=20000
-
-# Ignore duplicate commands
-export HISTCONTROL=ignoredups:ignorespace
-
-# Append to the history file instead of overwriting it
+HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 
-# Enable case-insensitive completion
+# Globbing
 shopt -s nocaseglob
 
-# Alias
+# Aliases
 alias ls='ls --color=auto'
 alias ll='ls -laAhF --color=auto'
-alias ..='cd ..'  
-alias ...='cd ../..'  
-alias ~='cd ~'  
+alias grep='grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
 
-# Source fzf keybinds
-if [ -f ~/.fzf.bash ]; then
-    source ~/.fzf.bash
+# fzf
+export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
+
+export FZF_DEFAULT_OPTS="
+  --height=80%
+  --layout=reverse
+  --border
+  --info=inline
+  --prompt='❯ '
+  --pointer='➜'
+  --marker='✓'
+  --preview-window=right:60%:wrap
+  --bind='ctrl-/:toggle-preview'
+"
+
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --style=numbers --color=always --line-range :500 {}'
+"
+
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+export FZF_ALT_C_OPTS="
+  --preview 'tree -C {} | head -200'
+"
+
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}'
+  --preview-window=down:3:hidden:wrap
+  --bind='ctrl-/:toggle-preview'
+"
+
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --bash)"
 fi
 
 # Alacritty completion
-if [ -f ~/.bash_completion/alacritty ]; then
-    source ~/.bash_completion/alacritty
-fi
+[ -f ~/.bash_completion/alacritty ] && source ~/.bash_completion/alacritty
+
 extract() {
     if [ -f "$1" ]; then
         case "$1" in
@@ -100,6 +126,4 @@ extract() {
     fi
 }
 
-if [[ $- == *i* ]]; then
-    echo "Welcome back, $(whoami)! Today is $(date +'%A, %B %d, %Y')."
-fi
+echo "Welcome back, $(whoami)! Today is $(date +'%A, %B %d, %Y')."
