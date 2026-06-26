@@ -1,68 +1,89 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Define the source directory (where your dotfiles are located)
-DOTFILES_DIR="$(pwd)"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# List of dotfiles to symlink
-declare -a dotfiles=(
-    ".bashrc"
-    ".gitconfig"
-    ".tmux.conf"
-    ".vimrc"
-)
+link() {
+    src="$1"
+    dst="$2"
 
-# Create symbolic links for dotfiles
-for file in "${dotfiles[@]}"; do
-    if [ -f "$HOME/$file" ]; then
-        echo "$HOME/$file already exists. Backing up..."
-        mv "$HOME/$file" "$HOME/$file.bak"
+    [ -e "$src" ] || return 0
+
+    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+        echo "Already linked: $dst"
+        return 0
     fi
-    ln -sf "$DOTFILES_DIR/$file" "$HOME/$file"
-    echo "Linked $file to $HOME/$file"
-done
 
-# Check and link Alacritty configuration if installed
-if command -v alacritty &> /dev/null; then
-    alacritty_config=".alacritty.toml"
-    if [ -f "$HOME/$alacritty_config" ]; then
-        echo "$HOME/$alacritty_config already exists. Backing up..."
-        mv "$HOME/$alacritty_config" "$HOME/$alacritty_config.bak"
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+        mv "$dst" "$dst.bak.$(date +%Y%m%d-%H%M%S)"
     fi
-    ln -sf "$DOTFILES_DIR/$alacritty_config" "$HOME/$alacritty_config"
-    echo "Linked $alacritty_config to $HOME/$alacritty_config"
+
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+    echo "Linked: $dst"
+}
+
+echo "Linking dotfiles..."
+
+link "$DOTFILES_DIR/.bashrc" "$HOME/.bashrc"
+link "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
+link "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
+link "$DOTFILES_DIR/.vimrc" "$HOME/.vimrc"
+
+command -v alacritty >/dev/null 2>&1 && \
+    link "$DOTFILES_DIR/.alacritty.toml" "$HOME/.alacritty.toml"
+
+command -v conky >/dev/null 2>&1 && \
+    link "$DOTFILES_DIR/.conkyrc" "$HOME/.conkyrc"
+
+echo
+echo "Checking tools..."
+
+missing=()
+
+has() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+has fzf || missing+=("fzf")
+has rg || missing+=("ripgrep")
+has tree || missing+=("tree")
+
+if ! has fd && ! has fdfind; then
+    missing+=("fd/fd-find")
+fi
+
+if ! has bat && ! has batcat; then
+    missing+=("bat")
+fi
+
+if [ "${#missing[@]}" -gt 0 ]; then
+    echo "Missing: ${missing[*]}"
+    echo
+    echo "Fedora:"
+    echo "  sudo dnf install -y fzf fd-find bat ripgrep tree"
+    echo
+    echo "Ubuntu:"
+    echo "  sudo apt-get update && sudo apt-get install -y fzf fd-find bat ripgrep tree"
 else
-    echo "Alacritty is not installed. Skipping .alacritty.toml link."
+    echo "All tools found."
 fi
 
-# Check and link Conky configuration if installed
-if command -v conky &> /dev/null; then
-    conky_config=".conkyrc"
-    if [ -f "$HOME/$conky_config" ]; then
-        echo "$HOME/$conky_config already exists. Backing up..."
-        mv "$HOME/$conky_config" "$HOME/$conky_config.bak"
-    fi
-    ln -sf "$DOTFILES_DIR/$conky_config" "$HOME/$conky_config"
-    echo "Linked $conky_config to $HOME/$conky_config"
-else
-    echo "Conky is not installed. Skipping .conkyrc link."
+echo
+echo "Creating compatibility symlinks..."
+
+mkdir -p "$HOME/.local/bin"
+
+if ! has fd && has fdfind; then
+    ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+    echo "Created: ~/.local/bin/fd"
 fi
 
-# Install fzf
-if ! command -v fzf &> /dev/null; then
-    echo "fzf not found. Installing fzf..."
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all
-else
-    echo "fzf is already installed."
+if ! has bat && has batcat; then
+    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+    echo "Created: ~/.local/bin/bat"
 fi
 
-# Install Vim plugins
-if command -v vim &> /dev/null; then
-    echo "Installing Vim plugins..."
-    vim +PlugInstall +qall
-fi
-
-echo "Reloading .bashrc..."
-source "$HOME/.bashrc"
-
-echo "Dotfiles installation complete!"
+echo
+echo "Done. Open a new shell or run:"
+echo "  source ~/.bashrc"
