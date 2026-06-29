@@ -11,7 +11,7 @@ call plug#begin()
     Plug 'vim-airline/vim-airline'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-commentary'
-    Plug '~/.fzf'
+    Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'morhetz/gruvbox'
     Plug 'rust-lang/rust.vim'
@@ -48,6 +48,16 @@ let g:ale_hover_type = 'floating'
 let g:ale_python_isort_options = '--profile black'
 let g:ale_python_black_options = '--line-length 100'
 let g:ale_python_flake8_options = '--ignore=E501,E211,W504,W503'
+
+let g:ale_c_build_dir_names = [
+\ 'build',
+\ 'build/*',
+\ 'build/*/*',
+\ 'build/Debug',
+\ 'build/Release'
+\ ]
+
+let g:ale_c_parse_compile_commands = 1
 
 set omnifunc=ale#completion#OmniFunc
 
