@@ -1,3 +1,4 @@
+set encoding=utf-8
 " PLUGINS ---------------------------------------------------------------------- {{{
 " Check if VimPlug is installed
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -10,13 +11,14 @@ call plug#begin()
     Plug 'dense-analysis/ale'
     Plug 'vim-airline/vim-airline'
     Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-commentary'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'morhetz/gruvbox'
     Plug 'rust-lang/rust.vim'
     Plug 'lervag/vimtex'
 call plug#end()
+
+packadd! comment
 
 " }}}
 
@@ -97,7 +99,20 @@ let g:vimtex_compiler_latexmk = {
     \}
 
 " Netrw settings
-autocmd FileType netrw setlocal nobuflisted bufhidden=wipe
+nmap <Plug>(netrw-refresh) <Plug>NetrwRefresh
+nmap <Plug>(netrw-hide-edit) <Plug>NetrwHideEdit
+augroup netrw_fixes
+  autocmd!
+  autocmd FileType netrw setlocal nobuflisted bufhidden=wipe
+  autocmd FileType netrw nmap <buffer> <leader>r <Plug>NetrwRefresh
+  autocmd FileType netrw nmap <buffer> <leader>h <Plug>NetrwHideEdit
+augroup END
+
+let s:gitignored = system('git ls-files --other --ignored --exclude-standard --directory')
+if !v:shell_error
+  let g:netrw_list_hide = join(split(s:gitignored, '\n'), ',')
+endif
+
 let g:netrw_banner = 0
 let g:netrw_liststyle = 3
 let g:netrw_winsize = 28
@@ -110,7 +125,6 @@ augroup filetype_vim
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
 
-set encoding=utf-8
 filetype plugin indent on
 syntax on
 set number
@@ -148,6 +162,23 @@ set secure
 set background=dark
 set textwidth=100
 set termguicolors
+set splitright
+set splitbelow
+set list
+set listchars=tab:»\ ,trail:·,nbsp:␣
+
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --smart-case
+  set grepformat=%f:%l:%c:%m
+endif
+
+" Fix Colors for ALE virtual text
+augroup ale_colors
+  autocmd!
+  autocmd ColorScheme * highlight ALEVirtualTextError   ctermfg=red    guifg=#fb4934
+  autocmd ColorScheme * highlight ALEVirtualTextWarning ctermfg=yellow guifg=#fabd2f
+  autocmd ColorScheme * highlight link ALEVirtualTextInfo Comment
+augroup END
 
 try
   colorscheme gruvbox
@@ -173,7 +204,6 @@ vnoremap K :m '<-2<CR>gv=gv
 nnoremap - @@
 
 " NVIM
-nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>
 nnoremap & :&&<CR>
 
 " Buffers
@@ -244,14 +274,6 @@ function! ToggleQuickFix()
   endif
 endfunction
 
-" Fix Colors for ALE virtual text
-function! SetAleTextColors() abort
-  highlight ALEVirtualTextError ctermfg=red
-  highlight ALEVirtualTextWarning ctermfg=yellow
-  highlight link ALEVirtualTextInfo Comment
-endfunction
-
-autocmd VimEnter * call SetAleTextColors()
 
 " }}}
 
@@ -259,13 +281,13 @@ autocmd VimEnter * call SetAleTextColors()
 
 augroup Binary
   au!
-  au BufReadPre *.elf,*.out,*.bin,*.hex let &bin=1
-  au BufReadPost *.elf,*.out,*.bin,*.hex if &bin | %!xxd
-  au BufReadPost *.elf,*.out,*.bin,*.hex set ft=xxd | endif
-  au BufWritePre *.elf,*.out,*.bin,*.hex if &bin | %!xxd -r
-  au BufWritePre *.elf,*.out,*.bin,*.hex endif
-  au BufWritePost *.elf,*.out,*.bin,*.hex if &bin | %!xxd
-  au BufWritePost *.elf,*.out,*.bin,*.hex set nomod | endif
+  au BufReadPre *.elf,*.bin let &bin=1
+  au BufReadPost *.elf,*.bin if &bin | %!xxd
+  au BufReadPost *.elf,*.bin set ft=xxd | endif
+  au BufWritePre *.elf,*.bin if &bin | %!xxd -r
+  au BufWritePre *.elf,*.bin endif
+  au BufWritePost *.elf,*.bin if &bin | %!xxd
+  au BufWritePost *.elf,*.bin set nomod | endif
 augroup END
 
 " }}}
