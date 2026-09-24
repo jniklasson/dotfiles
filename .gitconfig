@@ -29,6 +29,7 @@
     df = diff
     dw = diff --color --word-diff
     dc = diff --cached
+    dl = diff HEAD~1
     pl = pull
     ps = push
     rb = rebase
@@ -39,3 +40,5 @@
     stl = stash list
 [fetch]
     prune = true  # Automatically remove remote-tracking branches that no longer exist on the remote
+[push]
+	autoSetupRemote = true
