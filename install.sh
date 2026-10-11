@@ -33,9 +33,6 @@ link "$DOTFILES_DIR/.vimrc" "$HOME/.vimrc"
 command -v alacritty >/dev/null 2>&1 && \
     link "$DOTFILES_DIR/.alacritty.toml" "$HOME/.alacritty.toml"
 
-command -v conky >/dev/null 2>&1 && \
-    link "$DOTFILES_DIR/.conkyrc" "$HOME/.conkyrc"
-
 echo
 echo "Checking tools..."
 
