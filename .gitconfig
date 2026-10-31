@@ -1,7 +1,7 @@
 [include]
     path = ~/.gitconfig-local
 [core]
-	editor = vi
+	editor = vim
     autocrlf = input
 [diff]
 	tool = vimdiff
