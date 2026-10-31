@@ -16,6 +16,7 @@ call plug#begin()
     Plug 'morhetz/gruvbox'
     Plug 'rust-lang/rust.vim'
     Plug 'lervag/vimtex'
+    Plug 'sirtaj/vim-openscad'
 call plug#end()
 
 packadd! comment
