@@ -41,7 +41,7 @@ if [ -d "$HOME/.bashrc.d" ]; then
 fi
 
 # Environment
-export EDITOR='vi'
+export EDITOR="$(command -v vim || command -v vi)"
 
 # Readline / vi mode
 set -o vi
@@ -51,17 +51,15 @@ bind 'set vi-ins-mode-string "\1\e[38;5;245m\2[\1\e[92m\2I\1\e[38;5;245m\2]\1\e[
 bind 'set vi-cmd-mode-string "\1\e[38;5;245m\2[\1\e[95m\2N\1\e[38;5;245m\2]\1\e[0m\2 "'
 
 # Prompt
-PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)'
+PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null); history -a'
 PS1='\[\e[92m\]\u\[\e[0m\]@\h:[\[\e[38;5;51m\]\W\[\e[0m\]] \[\e[95m\]${PS1_CMD1}\[\e[0m\] \$ '
 
 # History
 HISTSIZE=10000
 HISTFILESIZE=20000
 HISTCONTROL=ignoredups:ignorespace
+HISTTIMEFORMAT='%F %T '
 shopt -s histappend
-
-# Globbing
-shopt -s nocaseglob
 
 # Aliases
 alias ls='ls --color=auto'
