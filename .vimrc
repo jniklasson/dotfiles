@@ -158,8 +158,6 @@ set nohlsearch
 set autoread
 set backspace=indent,eol,start
 set belloff=all
-set exrc 
-set secure
 set background=dark
 set textwidth=100
 set termguicolors
