@@ -138,6 +138,8 @@ set smarttab
 set expandtab
 set nobackup
 set noswapfile 
+set undofile
+set undodir=$HOME/.vim/undo/
 set scrolloff=25
 set nowrap
 set incsearch
