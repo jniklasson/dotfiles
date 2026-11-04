@@ -32,12 +32,6 @@ printf 'PATH=%s/.local/bin:%s/bin:$PATH\n' "$HOME" "$HOME" > ~/.config/environme
 if ! has fd && has fdfind; then ln -sf "$(command -v fdfind)" ~/.local/bin/fd; fi
 if ! has bat && has batcat; then ln -sf "$(command -v batcat)" ~/.local/bin/bat; fi
 
-if has alacritty && { [ -L ~/.alacritty.toml ] || [ ! -e ~/.alacritty.toml ]; }; then
-    rm -f ~/.alacritty.toml
-    printf '[general]\nimport = ["%s/.alacritty.toml"]\n\n[font]\nsize = 15.0\n' "$DOTFILES_DIR" > ~/.alacritty.toml
-    echo "Wrote: ~/.alacritty.toml"
-fi
-
 packages="fzf:fzf rg:ripgrep fd:fd-find bat:bat tree:tree"
 
 missing=()
