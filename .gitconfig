@@ -1,22 +1,14 @@
-[include]
-    path = ~/.gitconfig-local
 [core]
-	editor = vim
+    editor = vim
     autocrlf = input
 [diff]
-	tool = vimdiff
+    tool = vimdiff
 [merge]
-	tool = vimdiff
+    tool = vimdiff
     conflictstyle = diff3
 [mergetool]
-	keepBackup = false
+    keepBackup = false
     prompt = false
-[color]
-    ui = auto
-    branch = auto
-    diff = auto
-    status = auto
-    interactive = auto
 [alias]
     co = checkout
     br = branch
@@ -39,6 +31,8 @@
     sp = stash pop
     sl = stash list
 [fetch]
-    prune = true  # Automatically remove remote-tracking branches that no longer exist on the remote
+    prune = true
 [push]
-	autoSetupRemote = true
+    autoSetupRemote = true
+[include]
+    path = ~/.gitconfig-local

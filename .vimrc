@@ -1,31 +1,33 @@
 set encoding=utf-8
 " PLUGINS ---------------------------------------------------------------------- {{{
-" Check if VimPlug is installed
 if empty(glob('~/.vim/autoload/plug.vim'))
-  " Download VimPlug
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-call plug#begin()
-    Plug 'dense-analysis/ale'
-    Plug 'vim-airline/vim-airline'
-    Plug 'tpope/vim-fugitive'
-    Plug 'junegunn/fzf'
-    Plug 'junegunn/fzf.vim'
-    Plug 'morhetz/gruvbox'
-    Plug 'rust-lang/rust.vim'
-    Plug 'lervag/vimtex'
-    Plug 'sirtaj/vim-openscad'
-call plug#end()
+if filereadable(expand('~/.vim/autoload/plug.vim'))
+  call plug#begin()
+      Plug 'dense-analysis/ale'
+      Plug 'vim-airline/vim-airline'
+      Plug 'tpope/vim-fugitive'
+      Plug 'junegunn/fzf'
+      Plug 'junegunn/fzf.vim'
+      Plug 'morhetz/gruvbox'
+      Plug 'rust-lang/rust.vim'
+      Plug 'lervag/vimtex'
+      Plug 'sirtaj/vim-openscad'
+  call plug#end()
 
-packadd! comment
+  if !empty(filter(copy(g:plugs), '!isdirectory(v:val.dir)'))
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  endif
+endif
+
+silent! packadd! comment
 
 " }}}
 
 " PLUGIN SETTINGS ---------------------------------------------------------------------- {{{
 
-" ALE
 let g:ale_linters = {
       \ 'python':['flake8','jedils'],
       \ 'cpp': ['clangd'],
@@ -45,26 +47,18 @@ let g:ale_fix_on_save = 0
 let g:ale_floating_preview = 1
 let g:ale_completion_enabled = 1
 let g:ale_completion_autoimport = 0
-let g:ale_rust_cargo_use_clippy = 1
-let g:ale_hover_type = 'floating' 
+let g:ale_hover_type = 'floating'
 
 let g:ale_python_isort_options = '--profile black'
 let g:ale_python_black_options = '--line-length 100'
 let g:ale_python_flake8_options = '--ignore=E501,E211,W504,W503'
 
-let g:ale_c_build_dir_names = [
-\ 'build',
-\ 'build/*',
-\ 'build/*/*',
-\ 'build/Debug',
-\ 'build/Release'
-\ ]
+let g:ale_c_build_dir_names = ['build', 'build/Debug', 'build/Release', 'out', 'cmake-build-debug']
 
 let g:ale_c_parse_compile_commands = 1
 
 set omnifunc=ale#completion#OmniFunc
 
-" air-line
 let g:airline#extensions#ale#enabled=1
 let g:airline#extensions#tabline#enabled=1
 
@@ -74,7 +68,6 @@ if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
 
-" powerline symbols
 let g:airline_left_sep = ''
 let g:airline_left_alt_sep = ''
 let g:airline_right_sep = ''
@@ -86,9 +79,8 @@ let g:airline_symbols.linenr = ' :'
 let g:airline_symbols.maxlinenr = '☰ '
 let g:airline_symbols.dirty='⚡'
 
-" Gruvbox
-let g:gruvbox_contrast_dark = 'hard'  " Options: 'soft', 'medium', 'hard'
-let g:gruvbox_invert_selection = 0    " Keep selection background color
+let g:gruvbox_contrast_dark = 'hard'
+let g:gruvbox_invert_selection = 0
 
 let g:vimtex_compiler_method = 'latexmk'
 let g:vimtex_compiler_latexmk = {
@@ -99,7 +91,6 @@ let g:vimtex_compiler_latexmk = {
     \ ],
     \}
 
-" Netrw settings
 nmap <Plug>(netrw-refresh) <Plug>NetrwRefresh
 nmap <Plug>(netrw-hide-edit) <Plug>NetrwHideEdit
 augroup netrw_fixes
@@ -109,9 +100,9 @@ augroup netrw_fixes
   autocmd FileType netrw nmap <buffer> <leader>h <Plug>NetrwHideEdit
 augroup END
 
-let s:gitignored = system('git ls-files --other --ignored --exclude-standard --directory')
-if !v:shell_error
-  let g:netrw_list_hide = join(split(s:gitignored, '\n'), ',')
+silent! packadd netrw
+if !empty(globpath(&rtp, 'autoload/netrw_gitignore.vim'))
+  let g:netrw_list_hide = netrw_gitignore#Hide()
 endif
 
 let g:netrw_banner = 0
@@ -126,8 +117,6 @@ augroup filetype_vim
   autocmd FileType vim setlocal foldmethod=marker
 augroup END
 
-filetype plugin indent on
-syntax on
 set number
 set relativenumber
 set cursorline
@@ -137,7 +126,7 @@ set tabstop=4
 set smarttab
 set expandtab
 set nobackup
-set noswapfile 
+set noswapfile
 set undofile
 set undodir=$HOME/.vim/undo/
 set scrolloff=25
@@ -148,7 +137,6 @@ set colorcolumn=100
 set smartcase
 set showmatch
 set showcmd
-set showmode
 set history=1000
 set wildmenu
 set wildmode=list:longest
@@ -173,7 +161,6 @@ if executable('rg')
   set grepformat=%f:%l:%c:%m
 endif
 
-" Fix Colors for ALE virtual text
 augroup ale_colors
   autocmd!
   autocmd ColorScheme * highlight ALEVirtualTextError   ctermfg=red    guifg=#fb4934
@@ -204,10 +191,8 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 nnoremap - @@
 
-" NVIM
 nnoremap & :&&<CR>
 
-" Buffers
 nnoremap gb :Buffers<CR>
 nnoremap gl :b#<CR>
 nnoremap <C-n> :bnext<CR>
@@ -215,7 +200,6 @@ nnoremap <C-b> :bprevious<CR>
 nnoremap <leader>w :w<CR>
 nnoremap <leader>d :bp\|bd #<CR>
 
-" Windows
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
@@ -225,17 +209,14 @@ nnoremap <C-down> <C-w>-
 nnoremap <C-left> <C-w><
 nnoremap <C-right> <C-w>>
 
-" FZF & Ripgrep
 nnoremap <leader>f :Files<CR>
 nnoremap <leader>g :Rg<CR>
 vnoremap <leader>g :<C-u>call RipgrepVisualSelection()<CR>
 
-" LSP
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>": "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>": "\<S-Tab>"
 inoremap <expr> <CR> pumvisible() ? "\<C-y>": "\<CR>"
 
-" ALE
 nnoremap gh :ALEHover<CR>
 nnoremap gn :ALENext<CR>
 nnoremap gp :ALEPrevious<CR>
@@ -251,13 +232,10 @@ nnoremap <silent> <expr> <F2> &filetype ==# 'netrw'
       \ : ":Lexplore<CR>"
 nnoremap <F3> :Explore %:p:h<CR>
 
-" Quickfix window toggle
 nnoremap <F4> :<C-u>call ToggleQuickFix()<CR>
 " }}}
 
 " SCRIPTS ---------------------------------------------------------------------- {{{
-"
-"
 function! RipgrepVisualSelection()
   let old_reg = @"
   normal! gvy
@@ -274,7 +252,6 @@ function! ToggleQuickFix()
     cclose
   endif
 endfunction
-
 
 " }}}
 

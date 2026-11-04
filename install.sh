@@ -3,84 +3,49 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+has() {
+    command -v "$1" >/dev/null 2>&1
+}
+
 link() {
-    src="$1"
-    dst="$2"
-
-    [ -e "$src" ] || return 0
-
-    if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
-        echo "Already linked: $dst"
-        return 0
-    fi
-
+    local src="$DOTFILES_DIR/$1" dst="$2"
+    [ -e "$src" ] || { echo "missing $src" >&2; exit 1; }
+    [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ] && return
     if [ -e "$dst" ] || [ -L "$dst" ]; then
         mv "$dst" "$dst.bak.$(date +%Y%m%d-%H%M%S)"
+        echo "Backed up: $dst"
     fi
-
     mkdir -p "$(dirname "$dst")"
     ln -s "$src" "$dst"
     echo "Linked: $dst"
 }
 
-echo "Linking dotfiles..."
+link .bashrc    ~/.bashrc
+link .gitconfig ~/.gitconfig
+link .tmux.conf ~/.tmux.conf
+link .vimrc     ~/.vimrc
 
-link "$DOTFILES_DIR/.bashrc" "$HOME/.bashrc"
-link "$DOTFILES_DIR/.gitconfig" "$HOME/.gitconfig"
-link "$DOTFILES_DIR/.tmux.conf" "$HOME/.tmux.conf"
-link "$DOTFILES_DIR/.vimrc" "$HOME/.vimrc"
+mkdir -p ~/.local/bin ~/.vim/undo ~/.config/environment.d
+chmod 700 ~/.vim/undo
+printf 'PATH=%s/.local/bin:%s/bin:$PATH\n' "$HOME" "$HOME" > ~/.config/environment.d/paths.conf
 
-command -v alacritty >/dev/null 2>&1 && \
-    link "$DOTFILES_DIR/.alacritty.toml" "$HOME/.alacritty.toml"
+if ! has fd && has fdfind; then ln -sf "$(command -v fdfind)" ~/.local/bin/fd; fi
+if ! has bat && has batcat; then ln -sf "$(command -v batcat)" ~/.local/bin/bat; fi
 
-echo
-echo "Checking tools..."
+if has alacritty && { [ -L ~/.alacritty.toml ] || [ ! -e ~/.alacritty.toml ]; }; then
+    rm -f ~/.alacritty.toml
+    printf '[general]\nimport = ["%s/.alacritty.toml"]\n\n[font]\nsize = 15.0\n' "$DOTFILES_DIR" > ~/.alacritty.toml
+    echo "Wrote: ~/.alacritty.toml"
+fi
+
+packages="fzf:fzf rg:ripgrep fd:fd-find bat:bat tree:tree"
 
 missing=()
-
-has() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-has fzf || missing+=("fzf")
-has rg || missing+=("ripgrep")
-has tree || missing+=("tree")
-
-if ! has fd && ! has fdfind; then
-    missing+=("fd/fd-find")
-fi
-
-if ! has bat && ! has batcat; then
-    missing+=("bat")
-fi
-
-if [ "${#missing[@]}" -gt 0 ]; then
-    echo "Missing: ${missing[*]}"
-    echo
-    echo "Fedora:"
-    echo "  sudo dnf install -y fzf fd-find bat ripgrep tree"
-    echo
-    echo "Ubuntu:"
-    echo "  sudo apt-get update && sudo apt-get install -y fzf fd-find bat ripgrep tree"
-else
-    echo "All tools found."
-fi
-
-echo
-echo "Creating compatibility symlinks..."
-
-mkdir -p "$HOME/.local/bin"
-
-if ! has fd && has fdfind; then
-    ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
-    echo "Created: ~/.local/bin/fd"
-fi
-
-if ! has bat && has batcat; then
-    ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
-    echo "Created: ~/.local/bin/bat"
-fi
-
-echo
-echo "Done. Open a new shell or run:"
-echo "  source ~/.bashrc"
+for pair in $packages; do
+    case "${pair%%:*}" in
+        fd) has fd || has fdfind ;;
+        bat) has bat || has batcat ;;
+        *) has "${pair%%:*}" ;;
+    esac || missing+=("${pair#*:}")
+done
+[ ${#missing[@]} -eq 0 ] || echo "Missing packages: ${missing[*]}"
