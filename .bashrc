@@ -1,9 +1,14 @@
-[ -f /etc/bashrc ] && . /etc/bashrc
+for f in /etc/bashrc /etc/bash.bashrc; do
+    [ -f "$f" ] && { . "$f"; break; }
+done
+unset f
 
 case $- in
     *i*) ;;
     *) return ;;
 esac
+
+[ -f "$HOME/.bash_aliases" ] && . "$HOME/.bash_aliases"
 
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
